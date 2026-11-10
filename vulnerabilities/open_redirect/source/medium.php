@@ -8,8 +8,20 @@ if (array_key_exists ("redirect", $_GET) && $_GET['redirect'] != "") {
 		<?php
 		exit;
 	} else {
-		header ("location: " . $_GET['redirect']);
-		exit;
+		switch ($_GET['redirect']) {
+			case "info.php?id=1":
+				header ("location: info.php?id=1");
+				exit;
+			case "info.php?id=2":
+				header ("location: info.php?id=2");
+				exit;
+			default:
+				http_response_code (500);
+				?>
+				<p>Invalid redirect target.</p>
+				<?php
+				exit;
+		}
 	}
 }
 
