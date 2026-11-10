@@ -3,28 +3,28 @@
 if( isset( $_POST[ 'Submit' ]  ) ) {
 	// Get input
 	$target = $_REQUEST[ 'ip' ];
+	$cmd = '';
 
-	// Set blacklist
-	$substitutions = array(
-		'&&' => '',
-		';'  => '',
-	);
-
-	// Remove any of the characters in the array (blacklist).
-	$target = str_replace( array_keys( $substitutions ), $substitutions, $target );
-
-	// Determine OS and execute the ping command.
+	// Determine OS and execute the ping command for an allowed target.
 	if( stristr( php_uname( 's' ), 'Windows NT' ) ) {
 		// Windows
-		$cmd = shell_exec( 'ping  ' . $target );
+		if( $target === '127.0.0.1' ) {
+			$cmd = shell_exec( 'ping  127.0.0.1' );
+		} elseif( $target === 'localhost' ) {
+			$cmd = shell_exec( 'ping  localhost' );
+		}
 	}
 	else {
 		// *nix
-		$cmd = shell_exec( 'ping  -c 4 ' . $target );
+		if( $target === '127.0.0.1' ) {
+			$cmd = shell_exec( 'ping  -c 4 127.0.0.1' );
+		} elseif( $target === 'localhost' ) {
+			$cmd = shell_exec( 'ping  -c 4 localhost' );
+		}
 	}
 
 	// Feedback for the end user
-	$html .= "<pre>{$cmd}</pre>";
+	$html .= '<pre>' . htmlspecialchars( (string) $cmd, ENT_QUOTES, 'UTF-8' ) . '</pre>';
 }
 
 ?>
