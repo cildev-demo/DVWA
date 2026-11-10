@@ -9,55 +9,87 @@ $page = dvwaPageNewGrab();
 $page[ 'title' ] .= 'Source' . $page[ 'title_separator' ].$page[ 'title' ];
 
 if (array_key_exists ("id", $_GET) && array_key_exists ("security", $_GET)) {
-	$id       = $_GET[ 'id' ];
-	$security = $_GET[ 'security' ];
+	$id       = '';
+	$vuln     = 'Unknown Vulnerability';
 
-
-	switch ($id) {
+	switch ($_GET[ 'id' ]) {
 		case "fi" :
+			$id = 'fi';
 			$vuln = 'File Inclusion';
 			break;
 		case "brute" :
+			$id = 'brute';
 			$vuln = 'Brute Force';
 			break;
 		case "csrf" :
+			$id = 'csrf';
 			$vuln = 'CSRF';
 			break;
 		case "exec" :
+			$id = 'exec';
 			$vuln = 'Command Injection';
 			break;
 		case "sqli" :
+			$id = 'sqli';
 			$vuln = 'SQL Injection';
 			break;
 		case "sqli_blind" :
+			$id = 'sqli_blind';
 			$vuln = 'SQL Injection (Blind)';
 			break;
 		case "upload" :
+			$id = 'upload';
 			$vuln = 'File Upload';
 			break;
 		case "xss_r" :
+			$id = 'xss_r';
 			$vuln = 'Reflected XSS';
 			break;
 		case "xss_s" :
+			$id = 'xss_s';
 			$vuln = 'Stored XSS';
 			break;
 		case "weak_id" :
+			$id = 'weak_id';
 			$vuln = 'Weak Session IDs';
 			break;
 		case "javascript" :
+			$id = 'javascript';
 			$vuln = 'JavaScript';
 			break;
 		case "authbypass" :
+			$id = 'authbypass';
 			$vuln = 'Authorisation Bypass';
 			break;
 		case "open_redirect" :
+			$id = 'open_redirect';
 			$vuln = 'Open HTTP Redirect';
 			break;
 		case "bac":
+			$id = 'bac';
 			$vuln = 'Vulnerability: Broken Access Control';
 			break;
 		default:
+			$id = '';
 			$vuln = "Unknown Vulnerability";
+	}
+
+	$security = '';
+	switch ($_GET[ 'security' ]) {
+		case "low" :
+			$security = 'low';
+			break;
+		case "medium" :
+			$security = 'medium';
+			break;
+		case "high" :
+			$security = 'high';
+			break;
+		case "impossible" :
+			$security = 'impossible';
+			break;
+		default:
+			$security = '';
 	}
 
 	$source = @file_get_contents( DVWA_WEB_PAGE_TO_ROOT . "vulnerabilities/{$id}/source/{$security}.php" );
