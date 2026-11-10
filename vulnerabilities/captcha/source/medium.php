@@ -25,12 +25,14 @@ if( isset( $_POST[ 'Change' ] ) && ( $_POST[ 'step' ] == '1' ) ) {
 		// CAPTCHA was correct. Do both new passwords match?
 		if( $pass_new == $pass_conf ) {
 			// Show next stage for the user
+			$pass_new_esc  = htmlspecialchars( $pass_new, ENT_QUOTES, 'UTF-8' );
+			$pass_conf_esc = htmlspecialchars( $pass_conf, ENT_QUOTES, 'UTF-8' );
 			$html .= "
 				<pre><br />You passed the CAPTCHA! Click the button to confirm your changes.<br /></pre>
 				<form action=\"#\" method=\"POST\">
 					<input type=\"hidden\" name=\"step\" value=\"2\" />
-					<input type=\"hidden\" name=\"password_new\" value=\"{$pass_new}\" />
-					<input type=\"hidden\" name=\"password_conf\" value=\"{$pass_conf}\" />
+					<input type=\"hidden\" name=\"password_new\" value=\"{$pass_new_esc}\" />
+					<input type=\"hidden\" name=\"password_conf\" value=\"{$pass_conf_esc}\" />
 					<input type=\"hidden\" name=\"passed_captcha\" value=\"true\" />
 					<input type=\"submit\" name=\"Change\" value=\"Change\" />
 				</form>";
