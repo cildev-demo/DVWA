@@ -1,8 +1,12 @@
 <?php
 header("Content-Type: application/json; charset=UTF-8");
 
-if (array_key_exists ("callback", $_GET)) {
-	$callback = $_GET['callback'];
+if (array_key_exists("callback", $_GET)) {
+	if ($_GET['callback'] === 'solveSum') {
+		$callback = 'solveSum';
+	} else {
+		$callback = 'callback';
+	}
 } else {
 	return "";
 }
