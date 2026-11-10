@@ -11,9 +11,15 @@ header($headerCSP);
 ?>
 <?php
 if (isset ($_POST['include'])) {
+if ($_POST['include'] === 'https://cdn.jsdelivr.net/gh/digininja/csp_bypass/alert.js') {
 $page[ 'body' ] .= "
-	<script src='" . $_POST['include'] . "'></script>
+	<script src='https://cdn.jsdelivr.net/gh/digininja/csp_bypass/alert.js'></script>
 ";
+} elseif ($_POST['include'] === 'https://unpkg.com/@digininja/csp_bypass@1.0.0/index.js') {
+$page[ 'body' ] .= "
+	<script src='https://unpkg.com/@digininja/csp_bypass@1.0.0/index.js'></script>
+";
+}
 }
 $page[ 'body' ] .= '
 <form name="csp" method="POST">
