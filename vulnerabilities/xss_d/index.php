@@ -48,9 +48,22 @@ $page[ 'body' ] = <<<EOF
 		<form name="XSS" method="GET">
 			<select name="default">
 				<script>
-					if (document.location.href.indexOf("default=") >= 0) {
-						var lang = document.location.href.substring(document.location.href.indexOf("default=")+8);
-						document.write("<option value='" + lang + "'>" + $decodeURI(lang) + "</option>");
+					var defaultParam = new URLSearchParams(document.location.search).get("default");
+					if (defaultParam !== null) {
+						switch (defaultParam) {
+							case "French":
+								document.write("<option value='French'>French</option>");
+								break;
+							case "Spanish":
+								document.write("<option value='Spanish'>Spanish</option>");
+								break;
+							case "German":
+								document.write("<option value='German'>German</option>");
+								break;
+							default:
+								document.write("<option value='English'>English</option>");
+								break;
+						}
 						document.write("<option value='' disabled='disabled'>----</option>");
 					}
 					    
