@@ -20,7 +20,10 @@ if( isset( $_SESSION [ 'id' ] ) ) {
 				$last  = $row["last_name"];
 
 				// Feedback for end user
-				$html .= "<pre>ID: {$id}<br />First name: {$first}<br />Surname: {$last}</pre>";
+				$safe_id = htmlspecialchars( $id, ENT_QUOTES, 'UTF-8' );
+				$safe_first = htmlspecialchars( $first, ENT_QUOTES, 'UTF-8' );
+				$safe_last = htmlspecialchars( $last, ENT_QUOTES, 'UTF-8' );
+				$html .= "<pre>ID: {$safe_id}<br />First name: {$safe_first}<br />Surname: {$safe_last}</pre>";
 			}
 
 			mysqli_stmt_close($stmt);
@@ -47,7 +50,10 @@ if( isset( $_SESSION [ 'id' ] ) ) {
 					$last  = $row["last_name"];
 
 					// Feedback for end user
-					$html .= "<pre>ID: {$id}<br />First name: {$first}<br />Surname: {$last}</pre>";
+					$safe_id = htmlspecialchars( $id, ENT_QUOTES, 'UTF-8' );
+					$safe_first = htmlspecialchars( $first, ENT_QUOTES, 'UTF-8' );
+					$safe_last = htmlspecialchars( $last, ENT_QUOTES, 'UTF-8' );
+					$html .= "<pre>ID: {$safe_id}<br />First name: {$safe_first}<br />Surname: {$safe_last}</pre>";
 				}
 			} else {
 				echo "Error in fetch ".$sqlite_db->lastErrorMsg();
