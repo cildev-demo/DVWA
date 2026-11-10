@@ -8,21 +8,18 @@ if( isset( $_COOKIE[ 'id' ] ) ) {
 	switch ($_DVWA['SQLI_DB']) {
 		case MYSQL:
 			// Check database
-			$query  = "SELECT first_name, last_name FROM users WHERE user_id = '$id' LIMIT 1;";
+			$query  = "SELECT first_name, last_name FROM users WHERE user_id = ? LIMIT 1;";
 			try {
-				$result = mysqli_query($GLOBALS["___mysqli_ston"],  $query ); // Removed 'or die' to suppress mysql errors
-			} catch (Exception $e) {
-				$result = false;
-			}
-
-			$exists = false;
-			if ($result !== false) {
-				// Get results
-				try {
-					$exists = (mysqli_num_rows( $result ) > 0); // The '@' character suppresses errors
-				} catch(Exception $e) {
-					$exists = false;
+				$stmt = mysqli_prepare($GLOBALS["___mysqli_ston"], $query);
+				if ($stmt !== false) {
+					mysqli_stmt_bind_param($stmt, "s", $id);
+					mysqli_stmt_execute($stmt);
+					mysqli_stmt_store_result($stmt);
+					$exists = (mysqli_stmt_num_rows($stmt) > 0);
+					mysqli_stmt_close($stmt);
 				}
+			} catch (Exception $e) {
+				$exists = false;
 			}
 
 			((is_null($___mysqli_res = mysqli_close($GLOBALS["___mysqli_ston"]))) ? false : $___mysqli_res);
@@ -30,11 +27,19 @@ if( isset( $_COOKIE[ 'id' ] ) ) {
 		case SQLITE:
 			global $sqlite_db_connection;
 
-			$query  = "SELECT first_name, last_name FROM users WHERE user_id = '$id' LIMIT 1;";
+			$query  = "SELECT first_name, last_name FROM users WHERE user_id = :id LIMIT 1;";
 			try {
-				$results = $sqlite_db_connection->query($query);
-				$row = $results->fetchArray();
-				$exists = $row !== false;
+				$stmt = $sqlite_db_connection->prepare($query);
+				if ($stmt !== false) {
+					$stmt->bindValue(':id', $id, SQLITE3_TEXT);
+					$results = $stmt->execute();
+					if ($results !== false) {
+						$row = $results->fetchArray();
+						$exists = $row !== false;
+						$results->finalize();
+					}
+					$stmt->close();
+				}
 			} catch(Exception $e) {
 				$exists = false;
 			}
