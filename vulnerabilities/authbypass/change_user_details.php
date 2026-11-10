@@ -5,10 +5,9 @@ require_once DVWA_WEB_PAGE_TO_ROOT . 'dvwa/includes/dvwaPage.inc.php';
 dvwaDatabaseConnect();
 
 /*
-On impossible only the admin is allowed to retrieve the data.
+Only the admin user is allowed to update user details.
 */
-
-if (dvwaSecurityLevelGet() == "impossible" && dvwaCurrentUser() != "admin") {
+if (dvwaCurrentUser() != "admin") {
 	print json_encode (array ("result" => "fail", "error" => "Access denied"));
 	exit;
 }
@@ -39,6 +38,15 @@ try {
 						"result" => "fail",
 						"error" => 'Invalid format, expecting \"{id: {user ID}, first_name: "{first name}", surname: "{surname}\"}'
 
+					);
+	echo json_encode($result);
+	exit;
+}
+
+if (!is_object($data) || !isset($data->id) || !isset($data->first_name) || !isset($data->surname)) {
+	$result = array (
+						"result" => "fail",
+						"error" => 'Invalid format, expecting "{id: {user ID}, first_name: "{first name}", surname: "{surname}" }'
 					);
 	echo json_encode($result);
 	exit;
