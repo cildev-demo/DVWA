@@ -28,7 +28,7 @@ try {
 	if (is_null ($data)) {
 		$result = array (
 							"result" => "fail",
-							"error" => 'Invalid format, expecting "{id: {user ID}, first_name: "{first name}", surname: "{surname}"}'
+							"error" => 'Invalid format, expecting "{id: {user ID}, first_name: "{first name}", surname: "{surname}" }'
 
 						);
 		echo json_encode($result);
@@ -44,8 +44,14 @@ try {
 	exit;
 }
 
-$query = "UPDATE users SET first_name = '" . $data->first_name . "', last_name = '" .  $data->surname . "' where user_id = " . $data->id . "";
-$result = mysqli_query($GLOBALS["___mysqli_ston"],  $query ) or die( '<pre>' . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '</pre>' );
+$query = "UPDATE users SET first_name = ?, last_name = ? WHERE user_id = ?";
+$stmt = mysqli_prepare($GLOBALS["___mysqli_ston"], $query) or die( '<pre>' . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '</pre>' );
+$first_name = $data->first_name;
+$surname = $data->surname;
+$id = (int) $data->id;
+mysqli_stmt_bind_param($stmt, "ssi", $first_name, $surname, $id);
+mysqli_stmt_execute($stmt) or die( '<pre>' . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '</pre>' );
+mysqli_stmt_close($stmt);
 
 print json_encode (array ("result" => "ok"));
 exit;
