@@ -68,7 +68,7 @@ if ($log_result && mysqli_num_rows($log_result) > 0) {
         $html .= "<td>{$log['id']}</td>";
         $html .= "<td>{$log['accessor_user']} (ID: {$log['user_id']})</td>";
         $html .= "<td>{$target_user}</td>";
-        $html .= "<td>{$log['ip_address']}</td>";
+        $html .= "<td>" . htmlspecialchars($log['ip_address'], ENT_QUOTES, 'UTF-8') . "</td>";
         $html .= "<td>{$log['timestamp']}</td>";
         $html .= "</tr>";
     }
