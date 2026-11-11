@@ -1,13 +1,28 @@
 <?php
+define ("CIPHER", "aes-128-gcm");
+define ("TAG_LENGTH", 16);
+
 function encrypt ($plaintext, $key) {
-	$e = openssl_encrypt($plaintext, 'aes-128-ecb', $key, OPENSSL_PKCS1_PADDING);
+	$iv_length = openssl_cipher_iv_length (CIPHER);
+	if ($iv_length === false) {
+		throw new Exception ("Encryption failed");
+	}
+	$iv = random_bytes ($iv_length);
+	$tag = "";
+	$e = openssl_encrypt ($plaintext, CIPHER, $key, OPENSSL_RAW_DATA, $iv, $tag, "", TAG_LENGTH);
 	if ($e === false) {
 		throw new Exception ("Encryption failed");
 	}
-	return $e;
+	return $iv . $tag . $e;
 }
 function decrypt ($ciphertext, $key) {
-	$e = openssl_decrypt($ciphertext, 'aes-128-ecb', $key, OPENSSL_PKCS1_PADDING);
+	$iv_length = openssl_cipher_iv_length (CIPHER);
+	if ($iv_length === false || strlen ($ciphertext) < $iv_length + TAG_LENGTH) {
+		throw new Exception ("Decryption failed");
+	}
+	$iv = substr ($ciphertext, 0, $iv_length);
+	$tag = substr ($ciphertext, $iv_length, TAG_LENGTH);
+	$e = openssl_decrypt (substr ($ciphertext, $iv_length + TAG_LENGTH), CIPHER, $key, OPENSSL_RAW_DATA, $iv, $tag);
 	if ($e === false) {
 		throw new Exception ("Decryption failed");
 	}
@@ -78,6 +93,7 @@ print "New token:\n";
 var_dump (bin2hex($c));
 print "\n";
 
+try {
 $hacked_deciphered = decrypt($c, $key);
 print "Decrypted after swapping blocks around:\n";
 var_dump ($hacked_deciphered);
@@ -92,6 +108,9 @@ var_dump ($user);
 if ($user->user == "sweep" && $user->ex > time() && $user->level == "admin") {
 	print "Welcome administrator Sweep\n";
 } else {
+	print "Failed\n";
+}
+} catch (Exception $e) {
 	print "Failed\n";
 }
 
