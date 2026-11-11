@@ -23,7 +23,7 @@ if( isset( $_POST[ 'Upload' ] ) ) {
 		}
 		else {
 			// Yes!
-			$html .= "<pre>{$target_path} succesfully uploaded!</pre>";
+			$html .= '<pre>Your image was uploaded successfully!</pre>';
 		}
 	}
 	else {
