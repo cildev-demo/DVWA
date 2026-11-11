@@ -1,8 +1,11 @@
 <?php
 
 if (array_key_exists ("redirect", $_GET) && $_GET['redirect'] != "") {
-	if (strpos($_GET['redirect'], "info.php") !== false) {
-		header ("location: " . $_GET['redirect']);
+	if ($_GET['redirect'] === "info.php?id=1") {
+		header ("location: info.php?id=1");
+		exit;
+	} elseif ($_GET['redirect'] === "info.php?id=2") {
+		header ("location: info.php?id=2");
 		exit;
 	} else {
 		http_response_code (500);
