@@ -679,7 +679,7 @@ $DVWAUploadsWrite = 'Writable folder ' . $PHPUploadPath . ': <span class="' . ( 
 $bakWritable = 'Writable folder ' . $PHPCONFIGPath . ': <span class="' . ( is_writable( $PHPCONFIGPath ) ? 'success">Yes' : 'failure">No' ) . '</span>';   // config.php.bak check                                  // File Upload
 
 $DVWAOS           = 'Operating system: <em>' . ( strtoupper( substr (PHP_OS, 0, 3)) === 'WIN' ? 'Windows' : '*nix' ) . '</em>';
-$SERVER_NAME      = 'Web Server SERVER_NAME: <em>' . $_SERVER[ 'SERVER_NAME' ] . '</em>';                                                                                                          // CSRF
+$SERVER_NAME      = 'Web Server SERVER_NAME: <em>' . htmlspecialchars( $_SERVER[ 'SERVER_NAME' ] ) . '</em>';                                                                                                          // CSRF
 
 $MYSQL_USER       = 'Database username: <em>' . $_DVWA[ 'db_user' ] . '</em>';
 $MYSQL_PASS       = 'Database password: <em>' . ( ($_DVWA[ 'db_password' ] != "" ) ? '******' : '*blank*' ) . '</em>';
