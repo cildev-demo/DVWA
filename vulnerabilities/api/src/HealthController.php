@@ -84,8 +84,18 @@ class HealthController
 		$input = (array) json_decode(file_get_contents('php://input'), TRUE);
 		if (array_key_exists ("target", $input)) {
 			$target = $input['target'];
+			$ret_var = 1;
 
-			exec ("ping -c 4 " . escapeshellarg($target), $output, $ret_var);
+			if (is_string($target)) {
+				switch ($target) {
+					case 'digi.ninja':
+						exec ("ping -c 4 digi.ninja", $output, $ret_var);
+						break;
+					default:
+						$ret_var = 1;
+						break;
+				}
+			}
 
 			if ($ret_var == 0) {
 				$response['status_code_header'] = 'HTTP/1.1 200 OK';
