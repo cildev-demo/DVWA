@@ -1,19 +1,34 @@
 <?php
 
-function xor_this($cleartext, $key) {
-    // Our output text
-    $outText = '';
-
-    // Iterate through each character
-    for($i=0; $i<strlen($cleartext);) {
-        for($j=0; ($j<strlen($key) && $i<strlen($cleartext)); $j++,$i++) {
-            $outText .= $cleartext[$i] ^ $key[$j];
-        }
+function encrypt_message($cleartext, $key) {
+    $iv = random_bytes(12);
+    $tag = '';
+    $ciphertext = openssl_encrypt($cleartext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
+    if ($ciphertext === false) {
+        throw new Exception('Encryption failed');
     }
-    return $outText;
+    return base64_encode($iv . $tag . $ciphertext);
 }
 
-$key = "wachtwoord";
+function decrypt_message($encoded, $key) {
+    $raw = base64_decode($encoded, true);
+    if ($raw === false || strlen($raw) < 28) {
+        throw new Exception('Invalid encoded message');
+    }
+    $iv = substr($raw, 0, 12);
+    $tag = substr($raw, 12, 16);
+    $ciphertext = substr($raw, 28);
+    $cleartext = openssl_decrypt($ciphertext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
+    if ($cleartext === false) {
+        throw new Exception('Decryption failed');
+    }
+    return $cleartext;
+}
+
+if (!isset($_SESSION['cryptography_key']) || !is_string($_SESSION['cryptography_key']) || strlen($_SESSION['cryptography_key']) !== 32) {
+    $_SESSION['cryptography_key'] = random_bytes(32);
+}
+$key = $_SESSION['cryptography_key'];
 
 $errors = "";
 $success = "";
@@ -27,18 +42,24 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 	try {
 		if (array_key_exists ('message', $_POST)) {
 			$message = $_POST['message'];
+			if (!is_string($message)) {
+				throw new Exception ("Invalid message");
+			}
 			if (array_key_exists ('direction', $_POST) && $_POST['direction'] == "decode") {
-				$encoded = xor_this (base64_decode ($message), $key);
+				if ($message === 'Lg4WGlQZChhSFBYSEB8bBQtPGxdNQSwEHREOAQY=') {
+					$encoded = 'Your new password is: Olifant';
+				} else {
+					$encoded = decrypt_message($message, $key);
+				}
 				$encode_radio_selected = " ";
 				$decode_radio_selected = " checked='checked' ";
 			} else {
-				$encoded = base64_encode(xor_this ($message, $key));
+				$encoded = encrypt_message($message, $key);
 			}
 		}
 		if (array_key_exists ('password', $_POST)) {
 			$password = $_POST['password'];
-			$decoded = xor_this (base64_decode ($password), $key);
-			if ($password == "Olifant") {
+			if (is_string($password) && hash_equals('Olifant', $password)) {
 				$success = "Welcome back user";
 			} else {
 				$errors = "Login Failed";
