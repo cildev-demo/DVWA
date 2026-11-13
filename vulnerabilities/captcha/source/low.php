@@ -1,5 +1,9 @@
 <?php
 
+if( !isset( $_SESSION[ 'session_token' ] ) ) {
+	generateSessionToken();
+}
+
 if( isset( $_POST[ 'Change' ] ) && ( $_POST[ 'step' ] == '1' ) ) {
 	// Hide the CAPTCHA form
 	$hide_form = true;
@@ -32,6 +36,7 @@ if( isset( $_POST[ 'Change' ] ) && ( $_POST[ 'step' ] == '1' ) ) {
 				<pre><br />You passed the CAPTCHA! Click the button to confirm your changes.<br /></pre>
 				<form action=\"#\" method=\"POST\">
 					<input type=\"hidden\" name=\"step\" value=\"2\" />
+					" . tokenField() . "
 					<input type=\"hidden\" name=\"password_new\" value=\"{$pass_new_html}\" />
 					<input type=\"hidden\" name=\"password_conf\" value=\"{$pass_conf_html}\" />
 					<input type=\"submit\" name=\"Change\" value=\"Change\" />
@@ -48,6 +53,11 @@ if( isset( $_POST[ 'Change' ] ) && ( $_POST[ 'step' ] == '1' ) ) {
 if( isset( $_POST[ 'Change' ] ) && ( $_POST[ 'step' ] == '2' ) ) {
 	// Hide the CAPTCHA form
 	$hide_form = true;
+
+	// Check Anti-CSRF token
+	$user_token = array_key_exists( 'user_token', $_POST ) ? $_POST[ 'user_token' ] : '';
+	$session_token = isset( $_SESSION[ 'session_token' ] ) ? $_SESSION[ 'session_token' ] : '';
+	checkToken( $user_token, $session_token, 'index.php' );
 
 	// Get input
 	$pass_new  = $_POST[ 'password_new' ];
