@@ -14,6 +14,9 @@ $page[ 'source_button' ] = 'xss_s';
 dvwaDatabaseConnect();
 
 if (array_key_exists ("btnClear", $_POST)) {
+	$user_token = array_key_exists( 'user_token', $_POST ) ? $_POST[ 'user_token' ] : '';
+	$session_token = isset( $_SESSION[ 'session_token' ] ) ? $_SESSION[ 'session_token' ] : '';
+	checkToken( $user_token, $session_token, 'index.php' );
 	$query  = "TRUNCATE guestbook;";
 	$result = mysqli_query($GLOBALS["___mysqli_ston"],  $query ) or die( '<pre>' . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '</pre>' );
 }
@@ -35,6 +38,8 @@ switch( dvwaSecurityLevelGet() ) {
 }
 
 require_once DVWA_WEB_PAGE_TO_ROOT . "vulnerabilities/xss_s/source/{$vulnerabilityFile}";
+
+generateSessionToken();
 
 $page[ 'body' ] .= "
 <div class=\"body_padded\">
@@ -60,8 +65,7 @@ $page[ 'body' ] .= "
 				</tr>
 			</table>\n";
 
-if( $vulnerabilityFile == 'impossible.php' )
-	$page[ 'body' ] .= "			" . tokenField();
+$page[ 'body' ] .= "			" . tokenField();
 
 $page[ 'body' ] .= "
 		</form>
