@@ -1,9 +1,21 @@
 <?php
 
-if( isset( $_GET[ 'Change' ] ) ) {
-	// Get input
-	$pass_new  = $_GET[ 'password_new' ];
-	$pass_conf = $_GET[ 'password_conf' ];
+$change = false;
+
+if( $_SERVER[ 'REQUEST_METHOD' ] == "POST" &&
+	array_key_exists( "user_token", $_POST ) &&
+	array_key_exists( "password_new", $_POST ) &&
+	array_key_exists( "password_conf", $_POST ) &&
+	array_key_exists( "Change", $_POST ) ) {
+	$token     = $_POST[ 'user_token' ];
+	$pass_new  = $_POST[ 'password_new' ];
+	$pass_conf = $_POST[ 'password_conf' ];
+	$change    = true;
+}
+
+if( $change ) {
+	// Check Anti-CSRF token
+	checkToken( $token, $_SESSION[ 'session_token' ], 'index.php' );
 
 	// Do the passwords match?
 	if( $pass_new == $pass_conf ) {
@@ -13,8 +25,16 @@ if( isset( $_GET[ 'Change' ] ) ) {
 
 		// Update the database
 		$current_user = dvwaCurrentUser();
-		$insert = "UPDATE `users` SET password = '$pass_new' WHERE user = '" . $current_user . "';";
-		$result = mysqli_query($GLOBALS["___mysqli_ston"],  $insert ) or die( '<pre>' . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '</pre>' );
+		$insert = "UPDATE `users` SET password = ? WHERE user = ?;";
+		$stmt = mysqli_prepare( $GLOBALS["___mysqli_ston"], $insert );
+		if( !$stmt ) {
+			die( '<pre>' . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '</pre>' );
+		}
+		mysqli_stmt_bind_param( $stmt, "ss", $pass_new, $current_user );
+		if( !mysqli_stmt_execute( $stmt ) ) {
+			die( '<pre>' . mysqli_stmt_error( $stmt ) . '</pre>' );
+		}
+		mysqli_stmt_close( $stmt );
 
 		// Feedback for the user
 		$html .= "<pre>Password Changed.</pre>";
@@ -26,5 +46,8 @@ if( isset( $_GET[ 'Change' ] ) ) {
 
 	((is_null($___mysqli_res = mysqli_close($GLOBALS["___mysqli_ston"]))) ? false : $___mysqli_res);
 }
+
+// Generate Anti-CSRF token
+generateSessionToken();
 
 ?>
