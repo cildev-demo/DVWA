@@ -52,6 +52,43 @@ if (!is_object($data) || !isset($data->id) || !isset($data->first_name) || !isse
 	exit;
 }
 
+$expected_host = '';
+if (isset($_SERVER['HTTP_HOST']) && is_string($_SERVER['HTTP_HOST'])) {
+	$expected_host = $_SERVER['HTTP_HOST'];
+} elseif (isset($_SERVER['SERVER_NAME']) && is_string($_SERVER['SERVER_NAME'])) {
+	$expected_host = $_SERVER['SERVER_NAME'];
+}
+
+$source = '';
+if (isset($_SERVER['HTTP_ORIGIN']) && is_string($_SERVER['HTTP_ORIGIN'])) {
+	$source = $_SERVER['HTTP_ORIGIN'];
+} elseif (isset($_SERVER['HTTP_REFERER']) && is_string($_SERVER['HTTP_REFERER'])) {
+	$source = $_SERVER['HTTP_REFERER'];
+}
+
+$same_origin = false;
+if ($source !== '' && $expected_host !== '') {
+	$source_url = parse_url($source);
+	if (is_array($source_url) && isset($source_url['host']) && is_string($source_url['host'])) {
+		$source_host = $source_url['host'];
+		if (isset($source_url['port'])) {
+			$source_host .= ':' . $source_url['port'];
+		}
+		if (strcasecmp($source_host, $expected_host) === 0) {
+			$same_origin = true;
+		}
+	}
+}
+
+if (!$same_origin) {
+	$result = array (
+						"result" => "fail",
+						"error" => "Request rejected"
+					);
+	echo json_encode($result);
+	exit;
+}
+
 $query = "UPDATE users SET first_name = ?, last_name = ? WHERE user_id = ?";
 $stmt = mysqli_prepare($GLOBALS["___mysqli_ston"], $query) or die( '<pre>' . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '</pre>' );
 $first_name = $data->first_name;
