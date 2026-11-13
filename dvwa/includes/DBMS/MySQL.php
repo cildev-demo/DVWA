@@ -122,16 +122,6 @@ if( !mysqli_query($GLOBALS["___mysqli_ston"], $insert) ) {
 }
 dvwaMessagePush( "Data inserted into 'guestbook' table." );
 
-// Copy .bak for a fun directory listing vuln
-$conf = DVWA_WEB_PAGE_TO_ROOT . 'config/config.inc.php';
-$bakconf = DVWA_WEB_PAGE_TO_ROOT . 'config/config.inc.php.bak';
-if (file_exists($conf)) {
-    // Who cares if it fails. Suppress.
-    @copy($conf, $bakconf);
-}
-
-dvwaMessagePush( "Backup file /config/config.inc.php.bak automatically created" );
-
 // Done
 dvwaMessagePush( "<em>Setup successful</em>!" );
 
