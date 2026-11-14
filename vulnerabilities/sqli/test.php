@@ -9,6 +9,6 @@ mssql_select_db($database);
 $query ="SELECT * FROM users";
 $result =mssql_query($query);
 while ( $record = mssql_fetch_array($result) ) {
-	echo $record["first_name"] .", ". $record["password"] ."<br />";
+	echo htmlspecialchars($record["first_name"], ENT_QUOTES, 'UTF-8') ."<br />";
 }
 ?>
