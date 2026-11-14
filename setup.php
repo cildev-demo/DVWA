@@ -11,13 +11,10 @@ $page[ 'page_id' ] = 'setup';
 
 if( isset( $_POST[ 'create_db' ] ) ) {
 	// Anti-CSRF
-	if (array_key_exists ("session_token", $_SESSION)) {
-		$session_token = $_SESSION[ 'session_token' ];
-	} else {
-		$session_token = "";
-	}
+	$session_token = isset( $_SESSION[ 'session_token' ] ) && is_string( $_SESSION[ 'session_token' ] ) && $_SESSION[ 'session_token' ] !== '' ? $_SESSION[ 'session_token' ] : null;
+	$user_token = isset( $_POST[ 'user_token' ] ) && is_string( $_POST[ 'user_token' ] ) ? $_POST[ 'user_token' ] : null;
 
-	checkToken( $_REQUEST[ 'user_token' ], $session_token, 'setup.php' );
+	checkToken( $user_token, $session_token, 'setup.php' );
 
 	if( $DBMS == 'MySQL' ) {
 		include_once DVWA_WEB_PAGE_TO_ROOT . 'dvwa/includes/DBMS/MySQL.php';
