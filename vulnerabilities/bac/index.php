@@ -144,12 +144,12 @@ $page['body'] .= "
 
 $page['body'] .= "
         <h2>User Profile Access</h2>
-        <form action=\"#\" method=\"" . ($vulnerabilityFile === 'medium.php' ? 'POST' : 'GET') . "\">
+        <form action=\"#\" method=\"" . (($vulnerabilityFile === 'medium.php' || $vulnerabilityFile === 'low.php') ? 'POST' : 'GET') . "\">
             <p>
                 View user profile by ID: 
                 <input type=\"text\" name=\"user_id\" value=\"1\">
                 <input type=\"submit\" value=\"View Profile\" name=\"action\">
-                " . ($vulnerabilityFile === 'medium.php' ? tokenField() : '') . "
+                " . (($vulnerabilityFile === 'medium.php' || $vulnerabilityFile === 'low.php') ? tokenField() : '') . "
             </p>
         </form>
         
