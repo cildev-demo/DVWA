@@ -20,11 +20,15 @@ if ($stmt = mysqli_prepare($link, $query)) {
 }
 
 $html = "";
-if (isset($_GET['action']) && isset($_GET['user_id'])) {
-    if (!is_string($_GET['user_id']) || !preg_match('/^\d+$/', $_GET['user_id'])) {
+if (isset($_POST['action']) && isset($_POST['user_id'])) {
+    $user_token = isset($_POST['user_token']) ? $_POST['user_token'] : '';
+    $session_token = isset($_SESSION['session_token']) ? $_SESSION['session_token'] : '';
+    checkToken($user_token, $session_token, 'index.php');
+
+    if (!is_string($_POST['user_id']) || !preg_match('/^\d+$/', $_POST['user_id'])) {
         $html .= "<p>Invalid user ID format. Please enter a number.</p>";
     } else {
-        $id = (int) $_GET['user_id'];
+        $id = (int) $_POST['user_id'];
 
         if ($current_user_id <= 0 || $id !== $current_user_id) {
             $html .= "<p>Access denied. You can only view your own profile.</p>";
@@ -78,4 +82,7 @@ if (isset($_GET['action']) && isset($_GET['user_id'])) {
         }
     }
 }
+
+// Generate Anti-CSRF token
+generateSessionToken();
 ?>
