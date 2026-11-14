@@ -20,11 +20,15 @@ if ($stmt = mysqli_prepare($GLOBALS["___mysqli_ston"], $query)) {
 }
 
 $html = "";
-if (isset($_GET['action']) && isset($_GET['user_id'])) {
-    if (!preg_match('/^\d+$/', $_GET['user_id'])) {
+if (isset($_POST['action']) && isset($_POST['user_id'])) {
+    $user_token = isset($_POST['user_token']) ? $_POST['user_token'] : '';
+    $session_token = isset($_SESSION['session_token']) ? $_SESSION['session_token'] : '';
+    checkToken($user_token, $session_token, 'index.php');
+
+    if (!is_string($_POST['user_id']) || !preg_match('/^\d+$/', $_POST['user_id'])) {
         $html .= "<p>Invalid user ID format. Please enter a number.</p>";
     } else {
-        $id = intval($_GET['user_id']);
+        $id = intval($_POST['user_id']);
         $is_own_profile = ($current_user_id > 0 && $id === $current_user_id);
 
         if (!$is_own_profile) {
@@ -92,4 +96,6 @@ $html .= "<div class='info-banner'>Current Role: " . htmlspecialchars($role, ENT
 if (!isset($_COOKIE['user_role'])) {
     setcookie('user_role', 'regular_user', time() + 3600, '/');
 }
+
+generateSessionToken();
 ?>
